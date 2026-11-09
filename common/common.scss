@@ -35,7 +35,8 @@
 
 .community-banner {
   position: relative;
-  background: var(--banner-bg);
+  background: url("https://assets.ubuntu.com/v1/d064fdc8-summit_2610_bg.jpg");
+  background-position-y: bottom;
   color: var(--text-light);
   border-radius: 0;
   margin: 0;
