@@ -54,9 +54,10 @@
   align-items: start;
 }
 
-/* Logo */
-.banner-logo { max-width: 180px; visibility: hidden; }
-.banner-logo img { max-width: 100%; height: auto; display: block; }
+/* Spacer */
+.banner-spacer {
+  width: 100%;
+}
 
 /* Video */
 .community-banner .banner-video {
@@ -196,8 +197,8 @@
     gap: 0.75rem;
   }
 
-  /* 1. Completely hide big logo on small screens */
-  .banner-logo {
+  /* 1. Collapse the spacer on small screens so it takes up zero height */
+  .banner-spacer {
     display: none !important;
   }
 
