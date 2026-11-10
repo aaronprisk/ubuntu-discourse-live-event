@@ -238,6 +238,7 @@ export default apiInitializer("1.8.0", (api) => {
     // --- Standard internal routing helper ---
     const bindStandardCTA = (el) => {
       if (!el) return;
+      el.style.display = ""; // Ensure visible
       el.onclick = (e) => {
         const href = el.getAttribute("href") || "/";
         if (isSameOrigin(href)) {
@@ -249,28 +250,27 @@ export default apiInitializer("1.8.0", (api) => {
 
     // --- State-Driven CTA Behaviors ---
     if (!user) {
-      // 1. NOT LOGGED IN: Redirect to login/signup with return URL
-      const loginRedirect = (el) => {
-        if (!el) return;
-        el.onclick = (e) => {
+      // 1. NOT LOGGED IN: Show register prompt on primary button, hide chat and schedule
+      if (chatBtn) chatBtn.style.display = "none";
+      if (scheduleBtn) scheduleBtn.style.display = "none";
+
+      if (navBtn) {
+        navBtn.textContent = "Sign in to Register";
+        navBtn.onclick = (e) => {
           e.preventDefault();
-          const href = el.getAttribute("href") || "/";
-          if (isSameOrigin(href)) {
-            const returnUrl = href + (href.includes("?") ? "&" : "?") + "auto_join_summit=1";
-            window.location.href = `/login?return_to=${encodeURIComponent(returnUrl)}`;
-          } else {
-            window.location.href = href;
-          }
+          const targetUrl = window.location.pathname + (window.location.search ? window.location.search + "&" : "?") + "auto_join_summit=1";
+          window.location.href = `/login?return_to=${encodeURIComponent(targetUrl)}`;
         };
-      };
-      [navBtn, chatBtn, scheduleBtn].forEach(loginRedirect);
+      }
 
     } else {
-      // Check summit registration status
       const isRegistered = await checkSummitMembership(user, targetGroupName, targetGroupId);
 
       if (!isRegistered) {
-        // 2. LOGGED IN BUT NOT REGISTERED
+        // 2. LOGGED IN BUT NOT REGISTERED: Hide chat and schedule until registration completes
+        if (chatBtn) chatBtn.style.display = "none";
+        if (scheduleBtn) scheduleBtn.style.display = "none";
+
         if (navBtn) {
           navBtn.textContent = "+ Click to Register";
           navBtn.onclick = async (e) => {
@@ -283,12 +283,21 @@ export default apiInitializer("1.8.0", (api) => {
               cachedMembership = true;
               navBtn.textContent = "✓ Registered";
               setTimeout(() => {
-                // Restore primary CTA button label and functionality
+                // Restore primary button
                 navBtn.textContent = s.primary_cta_label || "Join";
                 navBtn.style.pointerEvents = "auto";
                 bindStandardCTA(navBtn);
-                [chatBtn, scheduleBtn].forEach(bindStandardCTA);
-              }, 1200);
+
+                // Reveal and bind secondary action buttons
+                if (chatBtn) {
+                  chatBtn.style.display = "";
+                  bindStandardCTA(chatBtn);
+                }
+                if (scheduleBtn) {
+                  scheduleBtn.style.display = "";
+                  bindStandardCTA(scheduleBtn);
+                }
+              }, 1000);
             } else {
               navBtn.textContent = "+ Click to Register";
               navBtn.style.pointerEvents = "auto";
@@ -296,19 +305,8 @@ export default apiInitializer("1.8.0", (api) => {
           };
         }
 
-        // Gate secondary actions so they prompt registration first
-        const gateSecondaryCTA = (el) => {
-          if (!el) return;
-          el.onclick = (e) => {
-            e.preventDefault();
-            navBtn?.scrollIntoView({ behavior: "smooth", block: "center" });
-            navBtn?.focus();
-          };
-        };
-        [chatBtn, scheduleBtn].forEach(gateSecondaryCTA);
-
       } else {
-        // 3. LOGGED IN & REGISTERED: Normal routing for all buttons
+        // 3. LOGGED IN & REGISTERED: Reveal and route all buttons
         [navBtn, chatBtn, scheduleBtn].forEach(bindStandardCTA);
       }
     }
