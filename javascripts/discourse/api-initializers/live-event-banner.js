@@ -239,6 +239,9 @@ export default apiInitializer("1.8.0", (api) => {
     const bindStandardCTA = (el) => {
       if (!el) return;
       el.style.display = ""; // Ensure visible
+      if (el === navBtn && s.primary_cta_label) {
+        navBtn.textContent = s.primary_cta_label;
+      }
       el.onclick = (e) => {
         const href = el.getAttribute("href") || "/";
         if (isSameOrigin(href)) {
@@ -282,22 +285,11 @@ export default apiInitializer("1.8.0", (api) => {
             if (success) {
               cachedMembership = true;
               navBtn.textContent = "✓ Registered";
-              setTimeout(() => {
-                // Restore primary button
-                navBtn.textContent = s.primary_cta_label || "Join";
-                navBtn.style.pointerEvents = "auto";
-                bindStandardCTA(navBtn);
 
-                // Reveal and bind secondary action buttons
-                if (chatBtn) {
-                  chatBtn.style.display = "";
-                  bindStandardCTA(chatBtn);
-                }
-                if (scheduleBtn) {
-                  scheduleBtn.style.display = "";
-                  bindStandardCTA(scheduleBtn);
-                }
-              }, 1000);
+              // Give visual confirmation, then refresh to hydrate Discourse Chat permissions
+              setTimeout(() => {
+                window.location.reload();
+              }, 800);
             } else {
               navBtn.textContent = "+ Click to Register";
               navBtn.style.pointerEvents = "auto";
