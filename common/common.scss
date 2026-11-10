@@ -35,7 +35,7 @@
 
 .community-banner {
   position: relative;
-  background: url("https://assets.ubuntu.com/v1/d064fdc8-summit_2610_bg.jpg");
+  background: url("https://assets.ubuntu.com/v1/062a5e16-summit_2610_bg_v2.jpg");
   background-position-y: bottom;
   color: var(--text-light);
   border-radius: 0;
@@ -55,7 +55,7 @@
 }
 
 /* Logo */
-.banner-logo { max-width: 180px; }
+.banner-logo { max-width: 180px; visibility: hidden; }
 .banner-logo img { max-width: 100%; height: auto; display: block; }
 
 /* Video */
